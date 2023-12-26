@@ -65,4 +65,17 @@ class Taskm
 
         return $this;
     }
+
+    // public function setDueDateFromString(string $dueDate): static
+    // {
+    //     $dateTime = \DateTime::createFromFormat('d/m/Y', $dueDate);
+
+    //     if ($dateTime === false) {
+    //         throw new \InvalidArgumentException('Invalid date format');
+    //     }
+
+    //     $this->dueDate = $dateTime;
+
+    //     return $this;
+    // }
 }

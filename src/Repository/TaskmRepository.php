@@ -21,13 +21,14 @@ class TaskmRepository extends ServiceEntityRepository
         parent::__construct($registry, Taskm::class);
     }
 
-
     public function insertTask($title, $description, $dueDate)
     {
         $task = new Taskm();
         $task->setTitle($title);
         $task->setDescription($description);
         $task->setDueDate(new \DateTime($dueDate));
+
+        // $task->setDueDateFromString($dueDate);
 
         $entityManager = $this->getEntityManager();
         $entityManager->persist($task);
@@ -36,7 +37,7 @@ class TaskmRepository extends ServiceEntityRepository
         return $task;
     }
 
-      public function updateTask($taskId, $title, $description, $dueDate)
+    public function updateTask($taskId, $title, $description, $dueDate)
     {
         $task = $this->find($taskId);
 
@@ -69,8 +70,21 @@ class TaskmRepository extends ServiceEntityRepository
         return true; // Task deleted successfully
     }
 
+    private function formatDueDate(Taskm $task): array
+    {
+        return [
+            'id' => $task->getId(),
+            'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'dueDate' => $task->getDueDate()->format('d/m/Y'), // Format the date as dd/mm/yyyy
+        ];
+    }
+
     public function getAllTasks()
     {
-        return $this->findAll();
+        $tasks = $this->findAll();
+
+        // Format due dates before returning
+        return array_map([$this, 'formatDueDate'], $tasks);
     }
 }
