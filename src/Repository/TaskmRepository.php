@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Taskm;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-
 /**
  * @extends ServiceEntityRepository<Taskm>
  *
@@ -27,9 +26,7 @@ class TaskmRepository extends ServiceEntityRepository
         $task->setTitle($title);
         $task->setDescription($description);
         $task->setDueDate(new \DateTime($dueDate));
-
-        // $task->setDueDateFromString($dueDate);
-
+        
         $entityManager = $this->getEntityManager();
         $entityManager->persist($task);
         $entityManager->flush();
@@ -37,7 +34,7 @@ class TaskmRepository extends ServiceEntityRepository
         return $task;
     }
 
-    public function updateTask($taskId, $title, $description, $dueDate)
+      public function updateTask($taskId, $title, $description, $dueDate)
     {
         $task = $this->find($taskId);
 
@@ -69,6 +66,8 @@ class TaskmRepository extends ServiceEntityRepository
 
         return true; // Task deleted successfully
     }
+
+ 
 
     private function formatDueDate(Taskm $task): array
     {

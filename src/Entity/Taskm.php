@@ -6,6 +6,7 @@ use App\Repository\TaskmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskmRepository::class)]
 #[Broadcast]
@@ -17,12 +18,16 @@ class Taskm
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Title is required')]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Description is required')]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: 'Due date is required')]
+    #[Assert\GreaterThanOrEqual('today', message: 'Due date must be in the future')]
     private ?\DateTimeInterface $dueDate = null;
 
     public function getId(): ?int
@@ -79,3 +84,14 @@ class Taskm
     //     return $this;
     // }
 }
+
+
+
+    // #[ORM\Column(length: 255)]
+    // private ?string $title = null;
+
+    // #[ORM\Column(type: Types::TEXT)]
+    // private ?string $description = null;
+
+    // #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    // private ?\DateTimeInterface $dueDate = null;
