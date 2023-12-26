@@ -23,7 +23,7 @@ class TaskController extends AbstractController
         return $this->json($task, Response::HTTP_CREATED);
     }
 
-    #[Route('/taskm/update/{id}', name: 'taskm_update', methods: ['POST'])]
+    #[Route('/taskm/update/{id}', name: 'taskm_update', methods: ['PUT'])]
     public function update($id, Request $request, TaskmRepository $taskRepository): Response
     {
         $data = json_decode($request->getContent(), true);
