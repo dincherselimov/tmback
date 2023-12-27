@@ -5,28 +5,55 @@ namespace App\Repository;
 use App\Entity\Taskm;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 /**
  * @extends ServiceEntityRepository<Taskm>
  *
- * @method Taskm|null find($id, $lockMode = null, $lockVersion = null)
- * @method Taskm|null findOneBy(array $criteria, array $orderBy = null)
- * @method Taskm[]    findAll()
- * @method Taskm[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Taskm|null insertTask(String:$title, String:$description, Date:$dueDate)
+ * @method Taskm|null updateTask(Integer:$taskId, String:$title, String:$description, Date:$dueDate)
+ * @method Taskm|null deleteTask(Integer:$taskId)
+ * @method Taskm|nul  getAllTasks()
  */
 class TaskmRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+
+    private $validator;
+
+    /**
+     * Undocumented function
+     *
+     * @param ManagerRegistry $registry
+     * @param ValidatorInterface $validator
+     */
+    public function __construct(ManagerRegistry $registry, ValidatorInterface $validator)
     {
         parent::__construct($registry, Taskm::class);
+        $this->validator = $validator;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param [type] $title
+     * @param [type] $description
+     * @param [type] $dueDate
+     * @return void
+     */
     public function insertTask($title, $description, $dueDate)
     {
         $task = new Taskm();
         $task->setTitle($title);
         $task->setDescription($description);
         $task->setDueDate(new \DateTime($dueDate));
-        
+
+        $violations = $this->validator->validate($task);
+
+        if ($violations->count() > 0) {
+
+            throw new \Exception((string) $violations);
+        }
+
         $entityManager = $this->getEntityManager();
         $entityManager->persist($task);
         $entityManager->flush();
@@ -34,17 +61,33 @@ class TaskmRepository extends ServiceEntityRepository
         return $task;
     }
 
-      public function updateTask($taskId, $title, $description, $dueDate)
+    /**
+     * Undocumented function
+     *
+     * @param [type] $taskId
+     * @param [type] $title
+     * @param [type] $description
+     * @param [type] $dueDate
+     * @return void
+     */
+    public function updateTask($taskId, $title, $description, $dueDate)
     {
         $task = $this->find($taskId);
 
         if (!$task) {
-            return null; // Task not found
+            return null;
         }
 
         $task->setTitle($title);
         $task->setDescription($description);
         $task->setDueDate(new \DateTime($dueDate));
+
+        $violations = $this->validator->validate($task);
+
+        if ($violations->count() > 0) {
+
+            throw new \Exception((string) $violations);
+        }
 
         $entityManager = $this->getEntityManager();
         $entityManager->flush();
@@ -52,6 +95,12 @@ class TaskmRepository extends ServiceEntityRepository
         return $task;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param [type] $taskId
+     * @return void
+     */
     public function deleteTask($taskId)
     {
         $task = $this->find($taskId);
@@ -67,23 +116,31 @@ class TaskmRepository extends ServiceEntityRepository
         return true; // Task deleted successfully
     }
 
- 
-
+    /**
+     * Undocumented function
+     *
+     * @param Taskm $task
+     * @return array
+     */
     private function formatDueDate(Taskm $task): array
     {
         return [
             'id' => $task->getId(),
             'title' => $task->getTitle(),
             'description' => $task->getDescription(),
-            'dueDate' => $task->getDueDate()->format('d/m/Y'), // Format the date as dd/mm/yyyy
+            'dueDate' => $task->getDueDate()->format('d.m.y'), // Format the date as dd/mm/yyyy
         ];
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
     public function getAllTasks()
     {
         $tasks = $this->findAll();
 
-        // Format due dates before returning
         return array_map([$this, 'formatDueDate'], $tasks);
     }
 }
